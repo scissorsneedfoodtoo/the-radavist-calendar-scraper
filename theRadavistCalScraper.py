@@ -1,7 +1,7 @@
 # /usr/bin/python3
 # theRadavistCalScraper - Downloads the current month's calendar from theradavist.com
 
-import requests, os, bs4
+import requests, os, bs4, re
 
 url = 'https://theradavist.com/?s=calendar' # base URL for most recent calendars
 header = {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1'}
@@ -30,9 +30,16 @@ def downloadCals(article):
         for p in paragraphs:
             if p.find('a'):
                 imageElems.append(p.find('a'))
+
+        # Process image names
         imageNames = []
         for link in imageElems:
-            imageNames.append(link.get_text()) # TODO: Clean up the names with regex and joins
+            regex = re.compile(r'(click here to download\s)|([\W\']s)|(\s–)')
+            tempName = link.get_text().lower()
+            tempName = re.sub(regex, '', tempName)
+            tempName = tempName.split(' ')
+            tempName = '-'.join(tempName)
+            imageNames.append(tempName)
 
         if imageElems == []:
             print('Could not find calendars.')
@@ -53,7 +60,7 @@ def downloadCals(article):
                 for chunk in res.iter_content(100000):
                     imageFile.write(chunk)
                 imageFile.close()
-        return # break out of the function
+        print('Finished!')
 
     else:
         print('The current post has no calendars. Moving to the next.')
@@ -61,5 +68,3 @@ def downloadCals(article):
         downloadCals(nextArticle)
 
 downloadCals(firstArticle)
-
-print('Finished!')
