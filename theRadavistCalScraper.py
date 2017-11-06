@@ -1,5 +1,6 @@
-# /usr/bin/python3
-# theRadavistCalScraper - Downloads the current month's calendar from theradavist.com
+#!/usr/bin/env python3
+# theRadavistCalScraper - Downloads the most current desktop calendar and
+# mobile wallpaper from theradavist.com
 
 import requests, os, bs4, re
 
@@ -37,7 +38,7 @@ def downloadCals(article):
             regex = re.compile(r'(click here to download\s)|([\W\']s)|(\s–)')
             tempName = link.get_text().lower()
             tempName = re.sub(regex, '', tempName)
-            tempName = tempName.split(' ')
+            tempName = tempName.split(' ') # consider checking for current year and appending it to the mobile name string
             tempName = '-'.join(tempName)
             imageNames.append(tempName)
 
